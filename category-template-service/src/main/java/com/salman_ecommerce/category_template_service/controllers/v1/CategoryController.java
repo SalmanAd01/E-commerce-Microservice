@@ -1,4 +1,4 @@
-package com.salman_ecommerce.category_template_service.controllers;
+package com.salman_ecommerce.category_template_service.controllers.v1;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
