@@ -28,8 +28,8 @@ public class Department {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "department_id")
-    private Long departmentId;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;

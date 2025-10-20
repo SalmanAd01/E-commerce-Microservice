@@ -24,6 +24,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     private DepartmentRepository departmentRepository;
 
     @Override
+    @Transactional
     public DepartmentDto createDepartment(CreateDepartmentDto dto) {
         if (departmentRepository.existsByName(dto.getName())) {
             throw new BadRequestException("Department with name '" + dto.getName() + "' already exists.");
@@ -34,6 +35,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional
     public DepartmentDto updateDepartment(Long id, UpdateDepartmentDto dto) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
@@ -45,6 +47,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional
     public DepartmentDto patchDepartment(Long id, UpdateDepartmentDto dto) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
@@ -56,10 +59,14 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public void deleteDepartment(Long id) {
-        departmentRepository.deleteByDepartmentId(id);
+        if (!departmentRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Department not found with id " + id);
+        }
+        departmentRepository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DepartmentDto getDepartment(Long id) {
         Department department = departmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
@@ -67,6 +74,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DepartmentDto> getAllDepartments() {
         return departmentRepository.findAll().stream()
                 .map(DepartmentMapper::toDto)
