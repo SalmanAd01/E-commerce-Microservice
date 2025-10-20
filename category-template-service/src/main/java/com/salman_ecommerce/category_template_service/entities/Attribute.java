@@ -1,11 +1,8 @@
 package com.salman_ecommerce.category_template_service.entities;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,17 +43,6 @@ public class Attribute {
     @Column(name = "data_type", nullable = false, length = 20)
     private DataType dataType;
 
-    @ElementCollection
-    @CollectionTable(
-        name = "allowed_values",
-        joinColumns = @JoinColumn(name = "attribute_id")
-    )
-    @Column(name = "allowed_value")
-    private List<String> allowedValues;
-
-    @Column(name = "unit", length = 20)
-    private String unit;
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -66,6 +52,6 @@ public class Attribute {
     }
 
     public enum DataType {
-        TEXT, NUMBER, BOOLEAN, ENUM
+        TEXT, NUMBER, BOOLEAN
     }
 }
