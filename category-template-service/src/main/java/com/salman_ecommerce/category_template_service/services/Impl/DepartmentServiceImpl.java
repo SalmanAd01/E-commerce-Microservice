@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.salman_ecommerce.category_template_service.dto.Department.CreateDepartmentDto;
 import com.salman_ecommerce.category_template_service.dto.Department.DepartmentDto;
@@ -15,8 +16,6 @@ import com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoun
 import com.salman_ecommerce.category_template_service.mapper.DepartmentMapper;
 import com.salman_ecommerce.category_template_service.repositories.DepartmentRepository;
 import com.salman_ecommerce.category_template_service.services.DepartmentService;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class DepartmentServiceImpl implements DepartmentService {
@@ -57,9 +56,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     @Transactional
     public void deleteDepartment(Long id) {
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
-        departmentRepository.delete(department);
+        departmentRepository.deleteByDepartmentId(id);
     }
 
     @Override

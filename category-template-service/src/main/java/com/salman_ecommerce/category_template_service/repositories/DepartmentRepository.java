@@ -6,4 +6,6 @@ import com.salman_ecommerce.category_template_service.entities.Department;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
     boolean existsByName(String name);
+
+    void deleteByDepartmentId(Long id);
 }
