@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
 
 import com.salman_ecommerce.category_template_service.dto.Department.CreateDepartmentDto;
 import com.salman_ecommerce.category_template_service.dto.Department.DepartmentDto;
@@ -30,32 +31,38 @@ public class DepartmentController {
     private DepartmentService departmentService;
 
     @PostMapping("/")
+    @Operation(summary = "Create a new department")
     public ResponseEntity<DepartmentDto> create(@RequestBody CreateDepartmentDto dto) {
         return new ResponseEntity<>(departmentService.createDepartment(dto), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a department")
     public ResponseEntity<DepartmentDto> update(@PathVariable Long id, @RequestBody UpdateDepartmentDto dto) {
         return ResponseEntity.ok(departmentService.updateDepartment(id, dto));
     }
 
     @PatchMapping("/{id}")
+    @Operation(summary = "Patch a department")
     public ResponseEntity<DepartmentDto> patch(@PathVariable Long id, @RequestBody UpdateDepartmentDto dto) {
         return ResponseEntity.ok(departmentService.patchDepartment(id, dto));
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a department")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         departmentService.deleteDepartment(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get department by id")
     public ResponseEntity<DepartmentDto> get(@PathVariable Long id) {
         return ResponseEntity.ok(departmentService.getDepartment(id));
     }
 
     @GetMapping("/")
+    @Operation(summary = "Get all departments")
     public ResponseEntity<List<DepartmentDto>> getAll() {
         return ResponseEntity.ok(departmentService.getAllDepartments());
     }

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.salman_ecommerce.category_template_service.dto.Category.CategoryDto;
 import com.salman_ecommerce.category_template_service.dto.Category.CreateCategoryDto;
+import com.salman_ecommerce.category_template_service.dto.Category.UpdateCategoryDto;
 import com.salman_ecommerce.category_template_service.entities.Category;
 import com.salman_ecommerce.category_template_service.exceptions.BadRequestException;
 import com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException;
@@ -38,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Resolve and set department
         if (categoryDto.getDepartmentId() != null) {
             var dept = departmentRepository.findById(categoryDto.getDepartmentId())
-                    .orElseThrow(() -> new com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException(
+                    .orElseThrow(() -> new ResourceNotFoundException(
                             "Department with id '" + categoryDto.getDepartmentId() + "' not found."));
             category.setDepartment(dept);
         }
@@ -59,16 +60,16 @@ public class CategoryServiceImpl implements CategoryService {
 
         // Resolve and set l1 category
         if (categoryDto.getL1CategoryId() != null) {
-            var l1 = categoryRepository.findById(categoryDto.getL1CategoryId())
-                    .orElseThrow(() -> new com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException(
+            var l1 = categoryRepository.findByIdAndLevel(categoryDto.getL1CategoryId(), 1)
+                    .orElseThrow(() -> new ResourceNotFoundException(
                             "L1 Category with id '" + categoryDto.getL1CategoryId() + "' not found."));
             category.setL1Category(l1);
         }
 
         // Resolve and set l2 category
         if (categoryDto.getL2CategoryId() != null) {
-            var l2 = categoryRepository.findById(categoryDto.getL2CategoryId())
-                    .orElseThrow(() -> new com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException(
+            var l2 = categoryRepository.findByIdAndLevel(categoryDto.getL2CategoryId(), 2)
+                    .orElseThrow(() -> new ResourceNotFoundException(
                             "L2 Category with id '" + categoryDto.getL2CategoryId() + "' not found."));
             category.setL2Category(l2);
         }
@@ -118,4 +119,24 @@ public class CategoryServiceImpl implements CategoryService {
         categoryRepository.deleteById(id);
     }
     
+    @Override
+    @Transactional(readOnly = true)
+    public CategoryDto getCategoryById(Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id "
+                        + id));
+        return CategoryMapper.toDto(category);
+    }
+
+    @Override
+    @Transactional
+    public CategoryDto updateCategory(Long id, UpdateCategoryDto updateCategoryDto) {
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with id " + id));
+        // Update fields
+        existingCategory.setName(updateCategoryDto.getName());
+        existingCategory.setDescription(updateCategoryDto.getDescription());
+        Category updatedCategory = categoryRepository.save(existingCategory);
+        return CategoryMapper.toDto(updatedCategory);
+    }
 }
