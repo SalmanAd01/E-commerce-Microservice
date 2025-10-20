@@ -33,7 +33,7 @@ public class Category {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @Column(name = "name", nullable = false, length=100)
+    @Column(name = "name", nullable = false, length=100, unique = true)
     private String name;
 
     @Column(name="level", nullable = false)

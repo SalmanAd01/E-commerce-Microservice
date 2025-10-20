@@ -65,7 +65,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         departmentRepository.deleteById(id);
     }
 
-    @Override
+    @Override   
     @Transactional(readOnly = true)
     public DepartmentDto getDepartment(Long id) {
         Department department = departmentRepository.findById(id)
