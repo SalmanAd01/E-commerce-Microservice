@@ -48,16 +48,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     @Transactional
-    public DepartmentDto patchDepartment(Long id, UpdateDepartmentDto dto) {
-        Department department = departmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Department not found with id " + id));
-        DepartmentMapper.updateEntity(dto, department); // selectively update non-null fields
-        Department updated = departmentRepository.save(department);
-        return DepartmentMapper.toDto(updated);
-    }
-
-    @Override
-    @Transactional
     public void deleteDepartment(Long id) {
         if (!departmentRepository.existsById(id)) {
             throw new ResourceNotFoundException("Department not found with id " + id);

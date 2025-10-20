@@ -7,19 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import io.swagger.v3.oas.annotations.Operation;
 
 import com.salman_ecommerce.category_template_service.dto.Department.CreateDepartmentDto;
 import com.salman_ecommerce.category_template_service.dto.Department.DepartmentDto;
 import com.salman_ecommerce.category_template_service.dto.Department.UpdateDepartmentDto;
 import com.salman_ecommerce.category_template_service.services.DepartmentService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 
 
@@ -42,11 +42,7 @@ public class DepartmentController {
         return ResponseEntity.ok(departmentService.updateDepartment(id, dto));
     }
 
-    @PatchMapping("/{id}")
-    @Operation(summary = "Patch a department")
-    public ResponseEntity<DepartmentDto> patch(@PathVariable Long id, @RequestBody UpdateDepartmentDto dto) {
-        return ResponseEntity.ok(departmentService.patchDepartment(id, dto));
-    }
+    
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a department")
