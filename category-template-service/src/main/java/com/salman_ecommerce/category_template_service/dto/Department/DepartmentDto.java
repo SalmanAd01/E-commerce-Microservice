@@ -1,4 +1,4 @@
-package com.salman_ecommerce.category_template_service.dto;
+package com.salman_ecommerce.category_template_service.dto.Department;
 
 import java.time.LocalDateTime;
 

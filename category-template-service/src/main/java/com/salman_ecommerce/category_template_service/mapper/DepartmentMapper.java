@@ -1,6 +1,6 @@
 package com.salman_ecommerce.category_template_service.mapper;
 
-import com.salman_ecommerce.category_template_service.dto.DepartmentDto;
+import com.salman_ecommerce.category_template_service.dto.Department.*;
 import com.salman_ecommerce.category_template_service.entities.Department;
 
 public class DepartmentMapper {
@@ -12,15 +12,17 @@ public class DepartmentMapper {
         dto.setDescription(department.getDescription());
         dto.setCreatedAt(department.getCreatedAt());
         return dto;
-    }   
-       
+    }
 
-    public static Department toEntity(DepartmentDto dto) {
+    public static Department toEntity(CreateDepartmentDto dto) {
         Department department = new Department();
-        department.setDepartmentId(dto.getId());
         department.setName(dto.getName());
         department.setDescription(dto.getDescription());
-        department.setCreatedAt(dto.getCreatedAt());
         return department;
+    }
+
+    public static void updateEntity(UpdateDepartmentDto dto, Department entity) {
+        if (dto.getName() != null) entity.setName(dto.getName());
+        if (dto.getDescription() != null) entity.setDescription(dto.getDescription());
     }
 }

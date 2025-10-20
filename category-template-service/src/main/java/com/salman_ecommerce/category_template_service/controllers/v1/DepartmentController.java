@@ -5,17 +5,21 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.salman_ecommerce.category_template_service.entities.Department;
-import com.salman_ecommerce.category_template_service.repositories.DepartmentRepository;
+import com.salman_ecommerce.category_template_service.dto.Department.CreateDepartmentDto;
+import com.salman_ecommerce.category_template_service.dto.Department.DepartmentDto;
+import com.salman_ecommerce.category_template_service.dto.Department.UpdateDepartmentDto;
 
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import com.salman_ecommerce.category_template_service.dto.DepartmentDto;
 import com.salman_ecommerce.category_template_service.services.DepartmentService;
 
 
@@ -25,20 +29,37 @@ import com.salman_ecommerce.category_template_service.services.DepartmentService
 public class DepartmentController {
     
     @Autowired
-    private DepartmentRepository departmentRepository;
-
-    @Autowired
     private DepartmentService departmentService;
 
-    @GetMapping("/")
-    public List<Department> getDepartments() {
-        return departmentRepository.findAll();
-    }
-    
     @PostMapping("/")
-    public ResponseEntity<DepartmentDto> createDepart(@RequestBody DepartmentDto departmentDto) {
-        DepartmentDto savedDepartmentDto = departmentService.createDepartment(departmentDto);
-        return new ResponseEntity<>(savedDepartmentDto, HttpStatus.CREATED);
+    public ResponseEntity<DepartmentDto> create(@RequestBody CreateDepartmentDto dto) {
+        return new ResponseEntity<>(departmentService.createDepartment(dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DepartmentDto> update(@PathVariable Long id, @RequestBody UpdateDepartmentDto dto) {
+        return ResponseEntity.ok(departmentService.updateDepartment(id, dto));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<DepartmentDto> patch(@PathVariable Long id, @RequestBody UpdateDepartmentDto dto) {
+        return ResponseEntity.ok(departmentService.patchDepartment(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        departmentService.deleteDepartment(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartmentDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(departmentService.getDepartment(id));
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<List<DepartmentDto>> getAll() {
+        return ResponseEntity.ok(departmentService.getAllDepartments());
     }
     
 }
