@@ -14,6 +14,8 @@ import com.salman_ecommerce.category_template_service.exceptions.BadRequestExcep
 import com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException;
 import com.salman_ecommerce.category_template_service.mapper.CategoryMapper;
 import com.salman_ecommerce.category_template_service.repositories.CategoryRepository;
+import com.salman_ecommerce.category_template_service.repositories.DepartmentRepository;
+import com.salman_ecommerce.category_template_service.repositories.TemplateRepository;
 import com.salman_ecommerce.category_template_service.services.CategoryService;
     
 @Service
@@ -23,10 +25,10 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryRepository categoryRepository;
     
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.DepartmentRepository departmentRepository;
+    private DepartmentRepository departmentRepository;
     
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.TemplateRepository templateRepository;
+    private TemplateRepository templateRepository;
 
     @Override
     @Transactional

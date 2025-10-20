@@ -16,22 +16,26 @@ import com.salman_ecommerce.category_template_service.entities.Template;
 import com.salman_ecommerce.category_template_service.exceptions.BadRequestException;
 import com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException;
 import com.salman_ecommerce.category_template_service.mapper.TemplateMapper;
+import com.salman_ecommerce.category_template_service.repositories.AttributeRepository;
+import com.salman_ecommerce.category_template_service.repositories.CategoryRepository;
+import com.salman_ecommerce.category_template_service.repositories.DepartmentRepository;
 import com.salman_ecommerce.category_template_service.repositories.TemplateRepository;
+import com.salman_ecommerce.category_template_service.services.TemplateService;
 
 @Service
-public class TemplateServiceImpl implements com.salman_ecommerce.category_template_service.services.TemplateService {
+public class TemplateServiceImpl implements TemplateService {
 
     @Autowired
     private TemplateRepository templateRepository;
 
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.DepartmentRepository departmentRepository;
+    private DepartmentRepository departmentRepository;
 
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.AttributeRepository attributeRepository;
+    private AttributeRepository attributeRepository;
 
     @Override
     @Transactional

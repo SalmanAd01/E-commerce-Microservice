@@ -14,18 +14,21 @@ import com.salman_ecommerce.category_template_service.exceptions.BadRequestExcep
 import com.salman_ecommerce.category_template_service.exceptions.ResourceNotFoundException;
 import com.salman_ecommerce.category_template_service.mapper.AttributeMapper;
 import com.salman_ecommerce.category_template_service.repositories.AttributeRepository;
+import com.salman_ecommerce.category_template_service.repositories.DepartmentRepository;
+import com.salman_ecommerce.category_template_service.repositories.TemplateRepository;
+import com.salman_ecommerce.category_template_service.services.AttributeService;
 
 @Service
-public class AttributeServiceImpl implements com.salman_ecommerce.category_template_service.services.AttributeService {
+public class AttributeServiceImpl implements AttributeService {
 
     @Autowired
     private AttributeRepository attributeRepository;
 
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.DepartmentRepository departmentRepository;
+    private DepartmentRepository departmentRepository;
 
     @Autowired
-    private com.salman_ecommerce.category_template_service.repositories.TemplateRepository templateRepository;
+    private TemplateRepository templateRepository;
 
     @Override
     @Transactional
