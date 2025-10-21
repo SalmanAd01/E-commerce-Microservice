@@ -1,9 +1,9 @@
 package com.salman_ecommerce.category_template_service.mapper;
 
-import com.salman_ecommerce.category_template_service.dto.Attribute.AttributeDto;
-import com.salman_ecommerce.category_template_service.dto.Attribute.CreateAttributeDto;
-import com.salman_ecommerce.category_template_service.dto.Attribute.UpdateAttributeDto;
-import com.salman_ecommerce.category_template_service.entities.Attribute;
+import com.salman_ecommerce.category_template_service.dto.attribute.AttributeDto;
+import com.salman_ecommerce.category_template_service.dto.attribute.CreateAttributeDto;
+import com.salman_ecommerce.category_template_service.dto.attribute.UpdateAttributeDto;
+import com.salman_ecommerce.category_template_service.entity.Attribute;
 
 public class AttributeMapper {
     public static AttributeDto toDto(Attribute attribute) {

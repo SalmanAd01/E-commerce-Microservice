@@ -3,11 +3,11 @@ package com.salman_ecommerce.category_template_service.mapper;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.salman_ecommerce.category_template_service.dto.Template.CreateTemplateDto;
-import com.salman_ecommerce.category_template_service.dto.Template.TemplateDto;
-import com.salman_ecommerce.category_template_service.dto.Template.UpdateTemplateDto;
-import com.salman_ecommerce.category_template_service.entities.Attribute;
-import com.salman_ecommerce.category_template_service.entities.Template;
+import com.salman_ecommerce.category_template_service.dto.template.CreateTemplateDto;
+import com.salman_ecommerce.category_template_service.dto.template.TemplateDto;
+import com.salman_ecommerce.category_template_service.dto.template.UpdateTemplateDto;
+import com.salman_ecommerce.category_template_service.entity.Attribute;
+import com.salman_ecommerce.category_template_service.entity.Template;
 
 public class TemplateMapper {
     public static TemplateDto toDto(Template t) {

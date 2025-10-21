@@ -1,7 +1,9 @@
 package com.salman_ecommerce.category_template_service.mapper;
 
-import com.salman_ecommerce.category_template_service.dto.Department.*;
-import com.salman_ecommerce.category_template_service.entities.Department;
+import com.salman_ecommerce.category_template_service.dto.department.CreateDepartmentDto;
+import com.salman_ecommerce.category_template_service.dto.department.DepartmentDto;
+import com.salman_ecommerce.category_template_service.dto.department.UpdateDepartmentDto;
+import com.salman_ecommerce.category_template_service.entity.Department;
 
 public class DepartmentMapper {
 

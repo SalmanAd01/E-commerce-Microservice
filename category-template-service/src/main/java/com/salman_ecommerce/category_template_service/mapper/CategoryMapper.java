@@ -1,9 +1,9 @@
 package com.salman_ecommerce.category_template_service.mapper;
 
-import com.salman_ecommerce.category_template_service.dto.Category.CategoryDto;
-import com.salman_ecommerce.category_template_service.dto.Category.CreateCategoryDto;
-import com.salman_ecommerce.category_template_service.dto.Category.UpdateCategoryDto;
-import com.salman_ecommerce.category_template_service.entities.Category;
+import com.salman_ecommerce.category_template_service.dto.category.CategoryDto;
+import com.salman_ecommerce.category_template_service.dto.category.CreateCategoryDto;
+import com.salman_ecommerce.category_template_service.dto.category.UpdateCategoryDto;
+import com.salman_ecommerce.category_template_service.entity.Category;
 
 public class CategoryMapper {
     public static CategoryDto toDto(Category category) {
