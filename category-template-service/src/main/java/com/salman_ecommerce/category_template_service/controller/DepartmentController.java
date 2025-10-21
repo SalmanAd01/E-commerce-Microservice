@@ -61,4 +61,3 @@ public class DepartmentController {
 		return ResponseEntity.ok(departmentService.getAllDepartments());
 	}
 }
-// ...existing code from DepartmentController.java (with updated package/imports)...

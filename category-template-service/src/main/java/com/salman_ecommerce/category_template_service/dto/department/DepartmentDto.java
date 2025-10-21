@@ -15,5 +15,3 @@ public class DepartmentDto {
 	private String description;
 	private LocalDateTime createdAt;
 }
-
-// ...existing code from DepartmentDto.java with updated package...

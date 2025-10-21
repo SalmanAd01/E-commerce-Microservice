@@ -11,5 +11,3 @@ public class UpdateCategoryDto {
 	private String name;
 	private String description;
 }
-
-// ...existing code from UpdateCategoryDto.java with updated package...

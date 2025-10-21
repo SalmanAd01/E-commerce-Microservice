@@ -14,5 +14,3 @@ public class CreateAttributeDto {
 	private String name;
 	private DataType dataType;
 }
-
-// ...existing code from CreateAttributeDto.java with updated package...

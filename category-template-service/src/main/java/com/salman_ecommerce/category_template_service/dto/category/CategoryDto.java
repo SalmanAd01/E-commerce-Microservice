@@ -19,5 +19,3 @@ public class CategoryDto {
 	private Long l1CategoryId;
 	private Long l2CategoryId;
 }
-
-// ...existing code from CategoryDto.java with updated package...

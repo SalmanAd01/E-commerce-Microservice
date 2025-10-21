@@ -14,5 +14,3 @@ public class UpdateTemplateDto {
 	private String description;
 	private List<Long> attributeIds;
 }
-
-// ...existing code from UpdateTemplateDto.java with updated package...

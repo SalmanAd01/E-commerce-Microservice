@@ -26,7 +26,6 @@ public class AttributeMapper {
     public static Attribute toEntity(UpdateAttributeDto dto) {
         Attribute attr = new Attribute();
         attr.setName(dto.getName());
-        // Do not change dataType on update via UpdateAttributeDto
         return attr;
     }
 }

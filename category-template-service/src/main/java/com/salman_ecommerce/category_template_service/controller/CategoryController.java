@@ -62,4 +62,3 @@ public class CategoryController {
 		return ResponseEntity.ok(updatedCategory);
 	}
 }
-// ...existing code from CategoryController.java (with updated package/imports)...

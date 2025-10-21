@@ -58,4 +58,3 @@ public class AttributeController {
 		return ResponseEntity.ok(attributeService.updateAttribute(id, dto));
 	}
 }
-// ...existing code from AttributeController.java (with updated package/imports)...

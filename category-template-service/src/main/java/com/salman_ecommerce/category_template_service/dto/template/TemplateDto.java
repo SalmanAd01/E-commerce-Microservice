@@ -19,5 +19,3 @@ public class TemplateDto {
 	private List<Long> attributeIds;
 	private LocalDateTime createdAt;
 }
-
-// ...existing code from TemplateDto.java with updated package...

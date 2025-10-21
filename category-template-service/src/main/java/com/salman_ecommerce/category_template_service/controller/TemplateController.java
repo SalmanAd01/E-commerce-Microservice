@@ -58,4 +58,3 @@ public class TemplateController {
 		return ResponseEntity.ok(templateService.updateTemplate(id, dto));
 	}
 }
-// ...existing code from TemplateController.java (with updated package/imports)...

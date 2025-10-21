@@ -10,5 +10,3 @@ import lombok.NoArgsConstructor;
 public class UpdateAttributeDto {
 	private String name;
 }
-
-// ...existing code from UpdateAttributeDto.java with updated package...

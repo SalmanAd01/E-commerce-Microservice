@@ -25,7 +25,6 @@ public class CategoryMapper {
         category.setName(createCategoryDto.getName());
         category.setDescription(createCategoryDto.getDescription());
         category.setLevel(createCategoryDto.getLevel());
-        // Note: relations (department, l1, l2) must be set by service after fetching entities by id
         return category;
     }
 

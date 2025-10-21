@@ -18,5 +18,3 @@ public class AttributeDto {
 	private DataType dataType;
 	private LocalDateTime createdAt;
 }
-
-// ...existing code from AttributeDto.java with updated package...

@@ -16,5 +16,3 @@ public class CreateTemplateDto {
 	private Long categoryId;
 	private List<Long> attributeIds;
 }
-
-// ...existing code from CreateTemplateDto.java with updated package...
