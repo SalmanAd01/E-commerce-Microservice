@@ -8,7 +8,7 @@ namespace product_catalog_service.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ProductController: ControllerBase
+    public class ProductController : ControllerBase
     {
         [HttpGet]
         public IActionResult GetProducts()

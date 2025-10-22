@@ -11,11 +11,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("MongoDbSettings"));
-var settings = builder.Configuration.GetSection("ConnectionStrings").Get<MongoDbSettings>()!;
-builder.Services.AddSingleton(settings);
-builder.Services.AddSingleton<IMongoDbContext, MongoDBContext>();
+// Configure MongoDB settings from appsettings (ConnectionStrings section)
+builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("ConnectionStrings"));
 
+// Register the MongoDB context and application services
+builder.Services.AddSingleton<IMongoDbContext, MongoDBContext>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddControllers();

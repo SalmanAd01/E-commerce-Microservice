@@ -6,8 +6,8 @@ using product_catalog_service.Models;
 
 namespace product_catalog_service.Repositories
 {
-    public interface IBrandRepository: IBaseRepository<Brand>
+    public interface IBrandRepository : IBaseRepository<Brand>
     {
-        
+
     }
 }

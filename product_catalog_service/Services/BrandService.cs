@@ -8,44 +8,50 @@ using product_catalog_service.Repositories;
 
 namespace product_catalog_service.Services
 {
-    public class BrandService(IBrandRepository brandRepository) : IBrandService
+    public class BrandService : IBrandService
     {
-        private readonly IBrandRepository _brandRepository = brandRepository;
+        private readonly IBrandRepository _brandRepository;
+
+        public BrandService(IBrandRepository brandRepository)
+        {
+            _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
+        }
 
         public async Task<BrandDto> CreateBrandAsync(CreateBrandDto createBrandDto)
         {
             var brand = BrandMappers.ToBrandFromCreateBrandDto(createBrandDto);
-            await _brandRepository.CreateAsync(brand);
-            return BrandMappers.ToBrandDto(brand);
+            var created = await _brandRepository.CreateAsync(brand).ConfigureAwait(false);
+            return BrandMappers.ToBrandDto(created);
         }
 
-        public Task DeleteBrandAsync(string id)
+        public async Task DeleteBrandAsync(string id)
         {
-            _brandRepository.DeleteAsync(id);
-            return Task.CompletedTask;
+            await _brandRepository.DeleteAsync(id).ConfigureAwait(false);
         }
 
-        public Task<List<BrandDto>> GetAllBrandsAsync()
+        public async Task<List<BrandDto>> GetAllBrandsAsync()
         {
-            var brands = _brandRepository.GetAllAsync().Result;
-            return Task.FromResult(brands.Select(BrandMappers.ToBrandDto).ToList());
+            var brands = await _brandRepository.GetAllAsync().ConfigureAwait(false);
+            return brands.Select(BrandMappers.ToBrandDto).ToList();
         }
 
-        public Task<BrandDto?> GetBrandByIdAsync(string id)
+        public async Task<BrandDto?> GetBrandByIdAsync(string id)
         {
-            var brand = _brandRepository.GetByIdAsync(id).Result;
-            if (brand == null)
-            {
-                return Task.FromResult<BrandDto?>(null);
-            }
-            return Task.FromResult(BrandMappers.ToBrandDto(brand))!;
+            var brand = await _brandRepository.GetByIdAsync(id).ConfigureAwait(false);
+            return brand == null ? null : BrandMappers.ToBrandDto(brand);
         }
 
-        public Task UpdateBrandAsync(string id, UpdateBrandDto updateBrandDto)
+        public async Task<BrandDto> UpdateBrandAsync(string id, UpdateBrandDto updateBrandDto)
         {
             var brand = BrandMappers.ToBrandFromUpdateBrandDto(updateBrandDto);
             brand.Id = id;
-            return _brandRepository.UpdateAsync(brand);
+            var updatedEntity = await _brandRepository.UpdateAsync(brand).ConfigureAwait(false);
+            if (updatedEntity == null)
+            {
+                throw new KeyNotFoundException($"Brand with id '{id}' was not found.");
+            }
+
+            return BrandMappers.ToBrandDto(updatedEntity);
         }
     }
 }

@@ -13,46 +13,50 @@ namespace product_catalog_service.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class BrandController(IBrandService brandService) : ControllerBase
+    public class BrandController : ControllerBase
     {
-        private readonly IBrandService _brandService = brandService;
+        private readonly IBrandService _brandService;
+
+        public BrandController(IBrandService brandService)
+        {
+            _brandService = brandService ?? throw new ArgumentNullException(nameof(brandService));
+        }
 
         [HttpGet]
-        public IActionResult GetBrands()
+        public async Task<ActionResult<List<BrandDto>>> GetBrands()
         {
-            var brands = _brandService.GetAllBrandsAsync().Result;
+            var brands = await _brandService.GetAllBrandsAsync().ConfigureAwait(false);
             return Ok(brands);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetBrandById(string id)
+        public async Task<ActionResult<BrandDto>> GetBrandById(string id)
         {
-            var brand = _brandService.GetBrandByIdAsync(id).Result;
-            if (brand == null)
-            {
-                return NotFound();
-            }
+            var brand = await _brandService.GetBrandByIdAsync(id).ConfigureAwait(false);
+            if (brand == null) return NotFound();
             return Ok(brand);
         }
 
         [HttpPost]
-        public IActionResult CreateBrand([FromBody] CreateBrandDto brand)
+        public async Task<IActionResult> CreateBrand([FromBody] CreateBrandDto brand)
         {
-            var createdBrand =  _brandService.CreateBrandAsync(brand).Result;
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var createdBrand = await _brandService.CreateBrandAsync(brand).ConfigureAwait(false);
             return CreatedAtAction(nameof(GetBrandById), new { id = createdBrand.Id }, createdBrand);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateBrand(string id, [FromBody] UpdateBrandDto brand)
+        public async Task<ActionResult<BrandDto>> UpdateBrand(string id, [FromBody] UpdateBrandDto brand)
         {
-            _brandService.UpdateBrandAsync(id, brand);
-            return NoContent();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var updated = await _brandService.UpdateBrandAsync(id, brand).ConfigureAwait(false);
+            return Ok(updated);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteBrand(string id)
+        public async Task<IActionResult> DeleteBrand(string id)
         {
-            _brandService.DeleteBrandAsync(id);
+            await _brandService.DeleteBrandAsync(id).ConfigureAwait(false);
             return NoContent();
         }
     }

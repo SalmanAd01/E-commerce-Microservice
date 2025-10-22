@@ -11,7 +11,7 @@ namespace product_catalog_service.Services
         Task<List<BrandDto>> GetAllBrandsAsync();
         Task<BrandDto?> GetBrandByIdAsync(string id);
         Task<BrandDto> CreateBrandAsync(CreateBrandDto createBrandDto);
-        Task UpdateBrandAsync(string id, UpdateBrandDto updateBrandDto);
-        Task DeleteBrandAsync(string id);        
+        Task<BrandDto> UpdateBrandAsync(string id, UpdateBrandDto updateBrandDto);
+        Task DeleteBrandAsync(string id);
     }
 }

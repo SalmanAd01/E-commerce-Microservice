@@ -23,7 +23,7 @@ namespace product_catalog_service.Mappers
         {
             return new BrandDto
             {
-                Id = brand.Id,
+                Id = brand.Id ?? string.Empty,
                 Name = brand.Name,
                 Description = brand.Description,
                 Logo = brand.Logo

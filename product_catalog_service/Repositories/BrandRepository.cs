@@ -7,7 +7,10 @@ using product_catalog_service.Models;
 
 namespace product_catalog_service.Repositories
 {
-    public class BrandRepository(IMongoDbContext context) : BaseRepository<Brand>(context, "Brands"), IBrandRepository
+    public class BrandRepository : BaseRepository<Brand>, IBrandRepository
     {
+        public BrandRepository(IMongoDbContext context) : base(context, "Brands")
+        {
+        }
     }
 }
