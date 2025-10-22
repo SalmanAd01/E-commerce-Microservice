@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace product_catalog_service.Models
 {
@@ -12,13 +13,19 @@ namespace product_catalog_service.Models
         [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        [BsonElement("name")]
-        public required string Name { get; set; }
+    [BsonElement("name")]
+    [Required]
+    [StringLength(100, MinimumLength = 1)]
+    public required string Name { get; set; }
 
-        [BsonElement("description")]
-        public required string Description { get; set; }
+    [BsonElement("description")]
+    [Required]
+    [StringLength(250, MinimumLength = 1)]
+    public required string Description { get; set; }
 
-        [BsonElement("logo")]
-        public required string Logo { get; set; }
+    [BsonElement("logo")]
+    [Required]
+    [Url]
+    public required string Logo { get; set; }
     }
 }

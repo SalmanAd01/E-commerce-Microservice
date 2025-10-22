@@ -40,7 +40,6 @@ namespace product_catalog_service.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBrand([FromBody] CreateBrandDto brand)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             var createdBrand = await _brandService.CreateBrandAsync(brand).ConfigureAwait(false);
             return CreatedAtAction(nameof(GetBrandById), new { id = createdBrand.Id }, createdBrand);
         }
@@ -48,7 +47,6 @@ namespace product_catalog_service.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<BrandDto>> UpdateBrand(string id, [FromBody] UpdateBrandDto brand)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
             var updated = await _brandService.UpdateBrandAsync(id, brand).ConfigureAwait(false);
             return Ok(updated);
         }
