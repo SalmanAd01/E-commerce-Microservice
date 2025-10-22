@@ -12,7 +12,7 @@ using product_catalog_service.Services;
 namespace product_catalog_service.Controllers
 {
     [ApiController]
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/brands")]
     public class BrandController : ControllerBase
     {
         private readonly IBrandService _brandService;
