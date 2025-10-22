@@ -53,16 +53,16 @@ namespace product_catalog_service.Models
         public string VariantId { get; set; } = Guid.NewGuid().ToString();
 
         [BsonElement("name")]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         [BsonElement("actual_price")]
-        public decimal ActualPrice { get; set; }
+        public required decimal ActualPrice { get; set; }
 
         [BsonElement("selling_price")]
-        public decimal SellingPrice { get; set; }
+        public required decimal SellingPrice { get; set; }
 
         [BsonElement("sku")]
-        public string Sku { get; set; }
+        public required string Sku { get; set; }
     }
 
     public class ProductAttribute
