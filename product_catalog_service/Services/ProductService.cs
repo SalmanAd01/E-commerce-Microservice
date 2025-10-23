@@ -85,6 +85,92 @@ namespace product_catalog_service.Services
             _logger.LogInformation("Created product {ProductId} from template {TemplateId}", created.Id, dto.TemplateId);
             return created;
         }
+
+        public async Task<Product> UpdateProductAsync(string id, CreateProductDto dto, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("id is required", nameof(id));
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            // ensure existing product
+            var existing = await _productRepository.GetByIdAsync(id).ConfigureAwait(false);
+            if (existing == null) throw new KeyNotFoundException($"Product with id '{id}' not found");
+
+
+            // Ensure immutable fields are not changed: template, department, category, brand
+            if (!string.Equals(dto.TemplateId, existing.TemplateId, StringComparison.Ordinal))
+                throw new ArgumentException("Template cannot be changed for an existing product");
+
+            if (!string.Equals(dto.CategoryId, existing.CategoryId, StringComparison.Ordinal))
+                throw new ArgumentException("Category cannot be changed for an existing product");
+
+            if (!string.Equals(dto.DepartmentId, existing.DepartmentId, StringComparison.Ordinal))
+                throw new ArgumentException("Department cannot be changed for an existing product");
+
+            if (!string.Equals(dto.BrandId, existing.BrandId, StringComparison.Ordinal))
+                throw new ArgumentException("Brand cannot be changed for an existing product");
+
+            // validate attributes against the product's existing template
+            var template = await _templateService.GetTemplateByIdAsync(existing.TemplateId, cancellationToken).ConfigureAwait(false);
+            if (template == null) throw new ArgumentException($"Template with id '{existing.TemplateId}' not found or template service unavailable");
+
+            var templateAttrs = template.Attributes?.ToDictionary(a => a.Id) ?? new System.Collections.Generic.Dictionary<int, TemplateAttributeDto>();
+
+            if (dto.Attributes != null)
+            {
+                foreach (var provided in dto.Attributes)
+                {
+                    if (!templateAttrs.TryGetValue(provided.AttributeId, out var expected))
+                        throw new ArgumentException($"Attribute id {provided.AttributeId} is not part of template");
+
+                    var expectedType = (expected.DataType ?? "").ToUpperInvariant();
+                    var value = provided.Value;
+                    var ok = expectedType switch
+                    {
+                        "TEXT" => value is string || (value is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.String),
+                        "NUMBER" => ProductServiceHelpers.IsNumber(value),
+                        "BOOLEAN" => value is bool || (value is System.Text.Json.JsonElement jeb && (jeb.ValueKind == System.Text.Json.JsonValueKind.True || jeb.ValueKind == System.Text.Json.JsonValueKind.False)),
+                        _ => false
+                    };
+
+                    if (!ok)
+                        throw new ArgumentException($"Attribute {expected.Name} expects {expectedType} value");
+                }
+            }
+
+            // map provided dto onto existing product (do NOT change template/category/department/brand)
+            existing.Name = dto.Name;
+            existing.Slug = dto.Slug;
+            existing.Description = dto.Description;
+            existing.ImageUrl = dto.ImageUrl;
+            existing.Attributes = dto.Attributes?.Select(a => new ProductAttribute { AttributeId = a.AttributeId, Value = ProductMapper.BsonValueFromObject(a.Value) }).ToList();
+            existing.Variants = dto.Variants.Select(v => new Variant { VariantId = Guid.NewGuid().ToString(), Name = v.Name, ActualPrice = v.ActualPrice, SellingPrice = v.SellingPrice ?? v.ActualPrice, Sku = v.Sku }).ToList();
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            var updated = await _productRepository.UpdateAsync(existing).ConfigureAwait(false);
+            if (updated == null) throw new KeyNotFoundException($"Product with id '{id}' was not found when updating");
+            _logger.LogInformation("Updated product {ProductId}", id);
+            return updated;
+        }
+
+        public async Task DeleteProductAsync(string id, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(id)) throw new ArgumentException("id is required", nameof(id));
+            var existing = await _productRepository.GetByIdAsync(id).ConfigureAwait(false);
+            if (existing == null) throw new KeyNotFoundException($"Product with id '{id}' not found");
+            await _productRepository.DeleteAsync(id).ConfigureAwait(false);
+            _logger.LogInformation("Deleted product {ProductId}", id);
+        }
+
+        public async Task<List<Product>> GetAllProductsAsync(CancellationToken cancellationToken = default)
+        {
+            return await _productRepository.GetAllAsync().ConfigureAwait(false);
+        }
+
+        public async Task<Product?> GetProductByIdAsync(string id, CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(id)) return null;
+            return await _productRepository.GetByIdAsync(id).ConfigureAwait(false);
+        }
     }
 
     internal static class ProductServiceHelpers

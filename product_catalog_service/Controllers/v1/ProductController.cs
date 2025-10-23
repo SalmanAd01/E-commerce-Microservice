@@ -26,16 +26,22 @@ namespace product_catalog_service.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<IActionResult> GetProducts()
         {
-            return Ok(new { Message = "Product API is working!" });
+            var products = await _productService.GetAllProductsAsync().ConfigureAwait(false);
+            var resp = products.Select(Mappers.ProductResponseMapper.ToResponse);
+            return Ok(resp);
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetProductById(int id)
+        public async Task<IActionResult> GetProductById(string id)
         {
-            return Ok(new { Message = $"Product API is working for product {id}!" });
-        }
+            var product = await _productService.GetProductByIdAsync(id).ConfigureAwait(false);
+            if (product == null) return NotFound();
+
+            var resp = Mappers.ProductResponseMapper.ToResponse(product);
+            return Ok(resp);
+        } 
 
         [HttpPost]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductDto dto, CancellationToken cancellationToken)
@@ -55,5 +61,42 @@ namespace product_catalog_service.Controllers
                 return NotFound(new { message = ex.Message });
             }
         }
+
+            [HttpPut("{id}")]
+            public async Task<IActionResult> UpdateProduct(string id, [FromBody] CreateProductDto dto, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    var updated = await _productService.UpdateProductAsync(id, dto, cancellationToken).ConfigureAwait(false);
+                    var resp = Mappers.ProductResponseMapper.ToResponse(updated);
+                    return Ok(resp);
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+            }
+
+            [HttpDelete("{id}")]
+            public async Task<IActionResult> DeleteProduct(string id, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    await _productService.DeleteProductAsync(id, cancellationToken).ConfigureAwait(false);
+                    return NoContent();
+                }
+                catch (ArgumentException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+                catch (KeyNotFoundException ex)
+                {
+                    return NotFound(new { message = ex.Message });
+                }
+            }
     }
 }
