@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using inventory_service.Dtos.Store;
-using inventory_service.Exceptions;
 using inventory_service.Mappers;
 using inventory_service.Repositories;
 
