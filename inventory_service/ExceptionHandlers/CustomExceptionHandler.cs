@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using inventory_service.Exceptions;
 using inventory_service.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
@@ -40,11 +39,6 @@ public class CustomExceptionHandler : IExceptionHandler
                     {
                         var raw = dbUpdateEx.InnerException.Message ?? string.Empty;
                         await WriteErrorResponseAsync(httpContext, HttpStatusCode.Conflict, "Conflict", raw, cancellationToken).ConfigureAwait(false);
-                        return true;
-                    }
-                case DuplicateKeyException dkex:
-                    {
-                        await WriteErrorResponseAsync(httpContext, HttpStatusCode.Conflict, "Conflict", dkex.Message, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
                 case KeyNotFoundException _:
