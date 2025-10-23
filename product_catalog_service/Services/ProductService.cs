@@ -143,7 +143,7 @@ namespace product_catalog_service.Services
             existing.Description = dto.Description;
             existing.ImageUrl = dto.ImageUrl;
             existing.Attributes = dto.Attributes?.Select(a => new ProductAttribute { AttributeId = a.AttributeId, Value = ProductMapper.BsonValueFromObject(a.Value) }).ToList();
-            existing.Variants = dto.Variants.Select(v => new Variant { VariantId = Guid.NewGuid().ToString(), Name = v.Name, ActualPrice = v.ActualPrice, SellingPrice = v.SellingPrice ?? v.ActualPrice, Sku = v.Sku }).ToList();
+            existing.Variants = dto.Variants.Select(v => new Variant { VariantId = Guid.NewGuid().ToString(), Name = v.Name, Sku = v.Sku }).ToList();
             existing.UpdatedAt = DateTime.UtcNow;
 
             var updated = await _productRepository.UpdateAsync(existing).ConfigureAwait(false);

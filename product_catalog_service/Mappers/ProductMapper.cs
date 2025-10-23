@@ -25,8 +25,9 @@ namespace product_catalog_service.Mappers
                 DepartmentId = dto.DepartmentId,
                 TemplateId = dto.TemplateId,
                 BrandId = dto.BrandId,
+                Unit = dto.Unit,
                 Attributes = dto.Attributes?.Select(a => new ProductAttribute { AttributeId = a.AttributeId, Value = BsonValueFromObject(a.Value) }).ToList(),
-                Variants = dto.Variants.Select(v => new Variant { Name = v.Name, ActualPrice = v.ActualPrice, SellingPrice = v.SellingPrice ?? v.ActualPrice, Sku = v.Sku }).ToList()
+                Variants = dto.Variants.Select(v => new Variant { Name = v.Name, Sku = v.Sku }).ToList()
             };
 
             return product;

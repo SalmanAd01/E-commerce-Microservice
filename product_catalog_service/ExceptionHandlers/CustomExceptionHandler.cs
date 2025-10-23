@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using MongoDB.Driver;
 using product_catalog_service.Models;
 
 namespace product_catalog_service.ExceptionHandlers
@@ -19,6 +20,10 @@ namespace product_catalog_service.ExceptionHandlers
 
             switch (exception)
             {
+                case MongoWriteException _:
+                    status = HttpStatusCode.Conflict;
+                    error = "Conflict";
+                    break;
                 case KeyNotFoundException _:
                     status = HttpStatusCode.NotFound;
                     error = "Not Found";

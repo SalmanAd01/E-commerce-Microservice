@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using product_catalog_service.Models;
 
 namespace product_catalog_service.Dtos.Product
 {
@@ -16,6 +18,9 @@ namespace product_catalog_service.Dtos.Product
         public string BrandId { get; set; } = default!;
         public List<ProductAttributeResponseDto>? Attributes { get; set; }
         public List<VariantResponseDto> Variants { get; set; } = new();
+   
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ProductUnit? Unit { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }
@@ -30,8 +35,6 @@ namespace product_catalog_service.Dtos.Product
     {
         public string VariantId { get; set; } = default!;
         public string Name { get; set; } = default!;
-        public decimal ActualPrice { get; set; }
-        public decimal SellingPrice { get; set; }
         public string Sku { get; set; } = default!;
     }
 }

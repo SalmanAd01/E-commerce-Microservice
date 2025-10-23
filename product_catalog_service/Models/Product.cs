@@ -1,7 +1,9 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Text.Json.Serialization;
 using System;
 using System.Collections.Generic;
+using product_catalog_service.Attributes;
 
 namespace product_catalog_service.Models
 {
@@ -13,7 +15,7 @@ namespace product_catalog_service.Models
 
         [BsonElement("name")]
         public required string Name { get; set; }
-
+        [MongoIndex(Unique = true)]
         [BsonElement("slug")]
         public required string Slug { get; set; }
 
@@ -34,6 +36,10 @@ namespace product_catalog_service.Models
 
         [BsonElement("brand_id")]
         public required string BrandId { get; set; }
+        [BsonElement("unit")]
+        [BsonRepresentation(BsonType.String)]
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ProductUnit? Unit { get; set; }
 
         [BsonElement("attributes")]
         public List<ProductAttribute>? Attributes { get; set; } = new();
@@ -54,13 +60,6 @@ namespace product_catalog_service.Models
 
         [BsonElement("name")]
         public required string Name { get; set; }
-
-        [BsonElement("actual_price")]
-        public required decimal ActualPrice { get; set; }
-
-        [BsonElement("selling_price")]
-        public required decimal SellingPrice { get; set; }
-
         [BsonElement("sku")]
         public required string Sku { get; set; }
     }
@@ -74,3 +73,9 @@ namespace product_catalog_service.Models
         public BsonValue? Value { get; set; }
     }
 }
+
+    public enum ProductUnit
+    {
+        Item,
+        Kg
+    }

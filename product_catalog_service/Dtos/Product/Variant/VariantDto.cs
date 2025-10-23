@@ -8,8 +8,6 @@ namespace product_catalog_service.Dtos.Product.Variant
     public class VariantDto
     {
         public required string Name { get; set; }
-        public required decimal ActualPrice { get; set; }
-        public decimal? SellingPrice { get; set; }
         public required string Sku { get; set; }
     }
 }

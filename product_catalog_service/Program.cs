@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.AddSingleton<IMongoDbContext, MongoDBContext>();
+builder.Services.AddSingleton<IMongoIndexService, MongoIndexService>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -39,6 +40,17 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
     };
 });
 var app = builder.Build();
+
+// Ensure indexes on startup
+using (var scope = app.Services.CreateScope())
+{
+    var indexService = scope.ServiceProvider.GetService<IMongoIndexService>();
+    if (indexService != null)
+    {
+        // fire-and-forget - but wait a short time to finish during startup
+        indexService.EnsureIndexesAsync().GetAwaiter().GetResult();
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
