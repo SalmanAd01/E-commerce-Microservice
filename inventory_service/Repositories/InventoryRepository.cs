@@ -16,9 +16,9 @@ namespace inventory_service.Repositories
             _context = context;
         }
 
-        public async Task<Inventory?> GetByStoreAndSkuAsync(int storeId, string sku)
+        public async Task<Inventory?> GetByStoreAndSkuAsync(int storeId, string sku, System.Threading.CancellationToken cancellationToken = default)
         {
-            return await _context.Inventories.FirstOrDefaultAsync(i => i.StoreId == storeId && i.ProductSku == sku);
+            return await _context.Inventories.FirstOrDefaultAsync(i => i.StoreId == storeId && i.ProductSku == sku, cancellationToken).ConfigureAwait(false);
         }
     }
 }

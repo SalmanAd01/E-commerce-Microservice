@@ -8,10 +8,10 @@ namespace inventory_service.Services
 {
     public interface IStoreService
     {
-        Task<List<StoreResponseDto>> GetAllStoresAsync();
-        Task<StoreResponseDto?> GetStoreByIdAsync(int id);
-        Task<StoreResponseDto> CreateStoreAsync(CreateStoreDto createDto);
-        Task<StoreResponseDto?> UpdateStoreAsync(int id, UpdateStoreDto updateDto);
-        Task DeleteStoreAsync(int id);
+        Task<List<StoreResponseDto>> GetAllStoresAsync(CancellationToken cancellationToken = default);
+        Task<StoreResponseDto?> GetStoreByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<StoreResponseDto> CreateStoreAsync(CreateStoreDto createDto, CancellationToken cancellationToken = default);
+        Task<StoreResponseDto?> UpdateStoreAsync(int id, UpdateStoreDto updateDto, CancellationToken cancellationToken = default);
+        Task DeleteStoreAsync(int id, CancellationToken cancellationToken = default);
     }
 }

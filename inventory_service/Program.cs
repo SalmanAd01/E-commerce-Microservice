@@ -22,7 +22,12 @@ builder.Services.AddScoped<IStoreRepository, StoreRepository>();
 builder.Services.AddScoped<IStoreService, StoreService>();
 builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
-builder.Services.AddHttpClient();
+// register a named HttpClient for the product API
+builder.Services.AddHttpClient("product", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ProductCatalogService:BaseUrl")!);
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();

@@ -19,16 +19,16 @@ namespace inventory_service.Controllers.v1
             _storeService = storeService ?? throw new ArgumentNullException(nameof(storeService));
         }
         [HttpGet]
-        public async Task<IActionResult> GetStores()
+        public async Task<IActionResult> GetStores(CancellationToken cancellationToken)
         {
-            var stores = await _storeService.GetAllStoresAsync();
+            var stores = await _storeService.GetAllStoresAsync(cancellationToken);
             return Ok(stores);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetStoreById(int id)
+        public async Task<IActionResult> GetStoreById(int id, CancellationToken cancellationToken)
         {
-            var store = await _storeService.GetStoreByIdAsync(id);
+            var store = await _storeService.GetStoreByIdAsync(id, cancellationToken);
             if (store == null)
             {
                 return NotFound();
@@ -37,17 +37,16 @@ namespace inventory_service.Controllers.v1
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateStore([FromBody] CreateStoreDto createDto)
+        public async Task<IActionResult> CreateStore([FromBody] CreateStoreDto createDto, CancellationToken cancellationToken)
         {
-            var createdStore = await _storeService.CreateStoreAsync(createDto);
+            var createdStore = await _storeService.CreateStoreAsync(createDto, cancellationToken);
             return CreatedAtAction(nameof(GetStoreById), new { id = createdStore.Id }, createdStore);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateStore(int id, [FromBody] UpdateStoreDto
-    updateDto)
+        public async Task<IActionResult> UpdateStore(int id, [FromBody] UpdateStoreDto updateDto, CancellationToken cancellationToken)
         {
-            var updatedStore = await _storeService.UpdateStoreAsync(id, updateDto);
+            var updatedStore = await _storeService.UpdateStoreAsync(id, updateDto, cancellationToken);
             if (updatedStore == null)
             {
                 return NotFound();
@@ -56,9 +55,9 @@ namespace inventory_service.Controllers.v1
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStore(int id)
+        public async Task<IActionResult> DeleteStore(int id, CancellationToken cancellationToken)
         {
-            await _storeService.DeleteStoreAsync(id);
+            await _storeService.DeleteStoreAsync(id, cancellationToken);
             return NoContent();
         }
         

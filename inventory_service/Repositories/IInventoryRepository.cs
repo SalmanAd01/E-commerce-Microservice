@@ -8,6 +8,6 @@ namespace inventory_service.Repositories
 {
     public interface IInventoryRepository: IBaseRepository<Inventory>
     {
-        Task<Inventory?> GetByStoreAndSkuAsync(int storeId, string sku);
+        Task<Inventory?> GetByStoreAndSkuAsync(int storeId, string sku, System.Threading.CancellationToken cancellationToken = default);
     }
 }

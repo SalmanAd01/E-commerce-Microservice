@@ -17,32 +17,32 @@ namespace inventory_service.Repositories
             _tableName = tableName;
 
         }
-        public async Task<T> CreateAsync(T entity)
+        public async Task<T> CreateAsync(T entity, System.Threading.CancellationToken cancellationToken = default)
         {
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await _context.Set<T>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id, System.Threading.CancellationToken cancellationToken = default)
         {
-            await _context.Database.ExecuteSqlRawAsync($"DELETE FROM {_tableName} WHERE Id = {{0}}", id);
+            await _context.Database.ExecuteSqlRawAsync($"DELETE FROM {_tableName} WHERE Id = {{0}}", cancellationToken, id).ConfigureAwait(false);
         }
 
-        public async Task<List<T?>> GetAllAsync()
+        public async Task<List<T>> GetAllAsync(System.Threading.CancellationToken cancellationToken = default)
         {
-            return await _context.Set<T>().ToListAsync();
+            return await _context.Set<T>().ToListAsync(cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<T?> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id, System.Threading.CancellationToken cancellationToken = default)
         {
-            return await _context.Set<T>().FindAsync(id);
+            return await _context.Set<T>().FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
         }
 
-        public async Task<T?> UpdateAsync(T entity)
+        public async Task<T?> UpdateAsync(T entity, System.Threading.CancellationToken cancellationToken = default)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         
         }
