@@ -28,6 +28,10 @@ namespace inventory_service.Models
         [Required]
         public required string ProductSku { get; set; }
 
+        [Column("product_id")]
+        [Required]
+        public required string ProductId { get; set; }
+
         [Column("total_quantity")]
         [Required]
         public int TotalQuantity { get; set; }
@@ -38,7 +42,6 @@ namespace inventory_service.Models
 
         [NotMapped]
         public int AvailableQuantity => TotalQuantity - ReservedQuantity;
-
 
         [Column("selling_price")]
         [Required]
