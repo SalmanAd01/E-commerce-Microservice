@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using inventory_service.Dtos.Store;
+using inventory_service.Exceptions;
 using inventory_service.Mappers;
 using inventory_service.Repositories;
 
@@ -17,30 +18,9 @@ namespace inventory_service.Services
         }
         public async Task<StoreResponseDto> CreateStoreAsync(CreateStoreDto createDto)
         {
-            var store = StoreMapper.fromCreateDto(createDto);
-            try
-            {
+            var store = StoreMapper.FromCreateDto(createDto);
                 var createdStore = await _storeRepository.CreateAsync(store);
-                return StoreMapper.toDto(createdStore);
-            }
-            catch (Microsoft.EntityFrameworkCore.DbUpdateException dbEx) when (dbEx.InnerException != null)
-            {
-                var inner = dbEx.InnerException;
-                var raw = inner.Message ?? string.Empty;
-                var match = System.Text.RegularExpressions.Regex.Match(raw, @"Key \(([^)]+)\)=\(([^)]+)\)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (match.Success)
-                {
-                    var column = match.Groups[1].Value;
-                    var value = match.Groups[2].Value;
-                    throw new inventory_service.Exceptions.DuplicateKeyException(column, value);
-                }
-                if (raw.IndexOf("duplicate", StringComparison.OrdinalIgnoreCase) >= 0 || raw.IndexOf("unique", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    throw new inventory_service.Exceptions.DuplicateKeyException(raw);
-                }
-
-                throw;
-            }
+                return StoreMapper.ToDto(createdStore);
         }
 
         public async Task DeleteStoreAsync(int id)
@@ -52,14 +32,14 @@ namespace inventory_service.Services
         {
             var stores = await _storeRepository.GetAllAsync();
             // Some repositories might return nullable items; filter them out before mapping.
-            return stores.Where(s => s != null).Select(StoreMapper.toDto!).ToList();
+            return stores.Where(s => s != null).Select(s => StoreMapper.ToDto(s!)).ToList();
         }
 
         public async Task<StoreResponseDto?> GetStoreByIdAsync(int id)
         {
             var store = await _storeRepository.GetByIdAsync(id);
             if (store == null) return null;
-            return StoreMapper.toDto(store);
+            return StoreMapper.ToDto(store);
         }
 
         public async Task<StoreResponseDto?> UpdateStoreAsync(int id, UpdateStoreDto updateDto)
@@ -80,7 +60,7 @@ namespace inventory_service.Services
 
             var updatedStore = await _storeRepository.UpdateAsync(store);
             if (updatedStore == null) return null;
-            return StoreMapper.toDto(updatedStore);
+            return StoreMapper.ToDto(updatedStore);
         }
     }
 }

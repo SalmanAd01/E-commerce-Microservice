@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using inventory_service.Exceptions;
@@ -37,12 +36,15 @@ public class CustomExceptionHandler : IExceptionHandler
 
             switch (exception)
             {
+                case DbUpdateException dbUpdateEx when dbUpdateEx.InnerException != null:
+                    {
+                        var raw = dbUpdateEx.InnerException.Message ?? string.Empty;
+                        await WriteErrorResponseAsync(httpContext, HttpStatusCode.Conflict, "Conflict", raw, cancellationToken).ConfigureAwait(false);
+                        return true;
+                    }
                 case DuplicateKeyException dkex:
                     {
-                        var resp = new ErrorResponse(HttpStatusCode.Conflict, "Conflict", dkex.Message);
-                        httpContext.Response.StatusCode = (int)HttpStatusCode.Conflict;
-                        httpContext.Response.ContentType = "application/json";
-                        await httpContext.Response.WriteAsJsonAsync(resp, cancellationToken).ConfigureAwait(false);
+                        await WriteErrorResponseAsync(httpContext, HttpStatusCode.Conflict, "Conflict", dkex.Message, cancellationToken).ConfigureAwait(false);
                         return true;
                     }
                 case KeyNotFoundException _:
@@ -58,13 +60,18 @@ public class CustomExceptionHandler : IExceptionHandler
                     error = "Internal Server Error";
                     break;
             }
-            var response = new ErrorResponse(status, error, exception?.Message ?? string.Empty);
+            var message = exception?.Message ?? string.Empty;
+            await WriteErrorResponseAsync(httpContext, status, error, message, cancellationToken).ConfigureAwait(false);
 
+            return true;
+        }
+
+        private static async Task WriteErrorResponseAsync(HttpContext httpContext, HttpStatusCode status, string error, string message, CancellationToken cancellationToken)
+        {
+            var response = new ErrorResponse(status, error, message ?? string.Empty);
             httpContext.Response.StatusCode = (int)status;
             httpContext.Response.ContentType = "application/json";
             await httpContext.Response.WriteAsJsonAsync(response, cancellationToken).ConfigureAwait(false);
-
-            return true;
         }
     }
 }

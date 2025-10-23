@@ -7,10 +7,11 @@ using inventory_service.Models;
 
 namespace inventory_service.Mappers
 {
-    public class StoreMapper
+    public static class StoreMapper
     {
-        public static StoreResponseDto toDto(Store store)
+        public static StoreResponseDto ToDto(Store? store)
         {
+            if (store == null) throw new ArgumentNullException(nameof(store));
             return new StoreResponseDto
             {
                 Id = store.Id,
@@ -26,8 +27,9 @@ namespace inventory_service.Mappers
             };
         }
 
-        public static Store fromCreateDto(CreateStoreDto createDto)
+        public static Store FromCreateDto(CreateStoreDto createDto)
         {
+            if (createDto == null) throw new ArgumentNullException(nameof(createDto));
             return new Store
             {
                 Name = createDto.Name,
