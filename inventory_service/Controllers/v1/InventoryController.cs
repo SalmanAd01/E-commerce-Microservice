@@ -37,34 +37,16 @@ namespace inventory_service.Controllers.v1
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateInventoryDto createDto, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            try
-            {
-                var created = await _inventoryService.CreateAsync(createDto, cancellationToken);
-                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var created = await _inventoryService.CreateAsync(createDto, cancellationToken);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateInventoryDto updateDto, CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            try
-            {
-                var updated = await _inventoryService.UpdateAsync(id, updateDto, cancellationToken);
-                if (updated == null) return NotFound();
-                return Ok(updated);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var updated = await _inventoryService.UpdateAsync(id, updateDto, cancellationToken);
+            if (updated == null) return NotFound();
+            return Ok(updated);
         }
 
         [HttpDelete("{id}")]
