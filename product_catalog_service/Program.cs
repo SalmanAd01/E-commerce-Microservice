@@ -17,6 +17,13 @@ builder.Services.Configure<MongoDbSettings>(builder.Configuration.GetSection("Co
 builder.Services.AddSingleton<IMongoDbContext, MongoDBContext>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddHttpClient<ITemplateService, TemplateService>(client =>
+{
+    client.BaseAddress = new Uri("http://localhost:8080/");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
