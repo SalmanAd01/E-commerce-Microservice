@@ -15,10 +15,16 @@ public class TemplateMapper {
         dto.setId(t.getId());
         dto.setName(t.getName());
         dto.setDescription(t.getDescription());
-        dto.setDepartmentId(t.getDepartment() != null ? t.getDepartment().getId() : null);
-        dto.setCategoryId(t.getCategory() != null ? t.getCategory().getId() : null);
+        if (t.getDepartment() != null) {
+            dto.setDepartment(new TemplateDto.TemplateDepartmentDto(t.getDepartment().getId(), t.getDepartment().getName()));
+        }
+        if (t.getCategory() != null) {
+            dto.setCategory(new TemplateDto.TemplateCategoryDto(t.getCategory().getId(), t.getCategory().getName()));
+        }
         if (t.getAttributes() != null) {
-            dto.setAttributeIds(t.getAttributes().stream().map(Attribute::getId).collect(Collectors.toList()));
+            dto.setAttributes(t.getAttributes().stream()
+                    .map(a -> new TemplateDto.TemplateAttributeDto(a.getId(), a.getName(), a.getDataType()))
+                    .collect(Collectors.toList()));
         }
         dto.setCreatedAt(t.getCreatedAt());
         return dto;
