@@ -73,8 +73,19 @@ public class TemplateServiceImpl implements TemplateService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<TemplateDto> getTemplates() {
-        return templateRepository.findAll().stream().map(TemplateMapper::toDto).collect(Collectors.toList());
+    public List<TemplateDto> getTemplates(Long departmentId, Long categoryId) {
+        if (departmentId != null && categoryId != null) {
+            return templateRepository.findByDepartmentIdAndCategoryId(departmentId, categoryId).stream()
+                    .map(TemplateMapper::toDto).collect(Collectors.toList());
+        } else if (departmentId != null) {
+            return templateRepository.findByDepartmentId(departmentId).stream()
+                    .map(TemplateMapper::toDto).collect(Collectors.toList());
+        } else if (categoryId != null) {
+            return templateRepository.findByCategoryId(categoryId).stream()
+                    .map(TemplateMapper::toDto).collect(Collectors.toList());
+        } else {
+            return templateRepository.findAll().stream().map(TemplateMapper::toDto).collect(Collectors.toList());
+        }
     }
 
     @Override

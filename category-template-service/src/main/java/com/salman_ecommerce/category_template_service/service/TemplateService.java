@@ -8,7 +8,7 @@ import com.salman_ecommerce.category_template_service.dto.template.UpdateTemplat
 
 public interface TemplateService {
     TemplateDto createTemplate(CreateTemplateDto createTemplateDto);
-    List<TemplateDto> getTemplates();
+    List<TemplateDto> getTemplates(Long departmentId, Long categoryId);
     void deleteTemplate(Long id);
     TemplateDto getTemplateById(Long id);
     TemplateDto updateTemplate(Long id, UpdateTemplateDto updateTemplateDto);

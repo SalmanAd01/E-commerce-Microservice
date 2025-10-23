@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.salman_ecommerce.category_template_service.dto.template.CreateTemplateDto;
@@ -30,9 +31,10 @@ public class TemplateController {
 	}
 
 	@GetMapping("/")
-	@Operation(summary = "Get all templates")
-	public ResponseEntity<List<TemplateDto>> getTemplates() {
-		return ResponseEntity.ok(templateService.getTemplates());
+	@Operation(summary = "Get all templates query parameters: departmentId, categoryId")
+	public ResponseEntity<List<TemplateDto>> getTemplates(@RequestParam(required = false) Long departmentId,
+			@RequestParam(required = false) Long categoryId) {
+		return ResponseEntity.ok(templateService.getTemplates(departmentId, categoryId));
 	}
 
 	@PostMapping("/")
