@@ -1,0 +1,19 @@
+{
+  "name": "payment_service",
+  "version": "1.0.0",
+  "description": "Payment Service for Ecommerce Microservice",
+  "license": "ISC",
+  "author": "Salman Adhikari <salmanadhikari415@gmail.com>",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "dev": "node --env-file .env --watch server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3",
+    "sequelize": "^6.37.7"
+  }
+}
