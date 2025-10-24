@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Razorpay Checkout</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button, textarea { font-size: 16px; padding: 8px; margin: 6px 0; width: 100%; }
+    .row { max-width: 720px; margin: 0 auto; }
+    label { font-weight: bold; }
+    pre { background: #f7f7f7; padding: 12px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="row">
+    <h1>Razorpay Checkout Demo</h1>
+
+    <p>Provide a Razorpay order id (for example: <code>order_RXAgj9s1dwh47n</code>) and click <strong>Pay</strong> to open checkout.</p>
+
+    <label for="orderId">Order ID (or pass ?order_id=order_xxx in URL)</label>
+    <input id="orderId" placeholder="order_RXAgj9s1dwh47n" />
+
+    <label for="keyId">Razorpay Key ID</label>
+    <input id="keyId" placeholder="rzp_test_****************" />
+
+    <label for="name">Customer name (optional)</label>
+    <input id="name" placeholder="John Doe" />
+
+    <label for="email">Customer email (optional)</label>
+    <input id="email" placeholder="john@example.com" />
+
+    <button id="payBtn">Pay</button>
+
+    <h3>Result</h3>
+    <pre id="result">No action yet.</pre>
+
+    <h3>Notes</h3>
+    <ul>
+      <li>This page opens Razorpay Checkout using <code>order_id</code>. The <strong>key</strong> is required.</li>
+      <li>After a successful payment, this page posts the payment details to <code>/razorpay/verify</code> on the same origin and displays the server response.</li>
+      <li>If you serve this file from a different origin than your API, enable CORS on the server or host this file under the same server.</li>
+    </ul>
+  </div>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    // Helper: read order_id from query string if present
+    function getQueryParam(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    const orderInput = document.getElementById('orderId');
+    const keyInput = document.getElementById('keyId');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const payBtn = document.getElementById('payBtn');
+    const result = document.getElementById('result');
+
+    // If ?order_id=... is provided, prefill
+    const qOrder = getQueryParam('order_id') || getQueryParam('orderId');
+    if (qOrder) orderInput.value = qOrder;
+
+    payBtn.addEventListener('click', async () => {
+      const order_id = orderInput.value.trim();
+      const key = keyInput.value.trim();
+      const customerName = nameInput.value.trim();
+      const customerEmail = emailInput.value.trim();
+
+      if (!order_id) {
+        alert('Please enter an order id (order_xxx)');
+        return;
+      }
+      if (!key) {
+        alert('Please enter your Razorpay Key ID (rzp_...)');
+        return;
+      }
+
+      const options = {
+        key: key,
+        order_id: order_id,
+        // commentary fields you can adjust
+        name: 'My Store',
+        description: 'Order Payment',
+        prefill: {
+          name: customerName || undefined,
+          email: customerEmail || undefined
+        },
+        handler: async function (response) {
+          // response contains: razorpay_payment_id, razorpay_order_id, razorpay_signature
+          result.textContent = 'Payment succeeded — verifying with server...\n' + JSON.stringify(response, null, 2);
+
+          // POST to server verification endpoint
+          try {
+            const verifyPayload = {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            };
+
+            // Optionally include localOrderId, amount, currency if your flow needs it
+            // verifyPayload.localOrderId = 123;
+
+            const res = await fetch('http://localhost:8000/razorpay/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(verifyPayload)
+            });
+
+            const json = await res.json();
+            result.textContent += '\n\nServer verification response:\n' + JSON.stringify(json, null, 2);
+          } catch (err) {
+            result.textContent += '\n\nError verifying payment with server:\n' + err;
+          }
+        },
+        modal: { escape: true }
+      };
+
+      // Open the Razorpay checkout
+      const rzp = new Razorpay(options);
+      rzp.open();
+    });
+  </script>
+</body>
+</html>
