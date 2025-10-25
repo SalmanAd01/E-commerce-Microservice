@@ -36,6 +36,9 @@ public class OrderItem {
     @Column(name = "product_id", nullable = false)
     private String productId;
 
+    @Column(name = "store_id", nullable = false)
+    private Long storeId;
+
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
