@@ -12,5 +12,7 @@ namespace inventory_service.Services
         Task<InventoryResponseDto> CreateAsync(CreateInventoryDto createDto, CancellationToken cancellationToken = default);
         Task<InventoryResponseDto?> UpdateAsync(int id, UpdateInventoryDto updateDto, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+
+        Task<InventoryResponseDto?> GetByStoreAndProductSkuAsync(int storeId, string productSku, CancellationToken cancellationToken = default);
     }
 }

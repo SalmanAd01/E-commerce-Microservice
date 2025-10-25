@@ -4,6 +4,7 @@ import Payment from './models/payment.js';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJSDoc from 'swagger-jsdoc';
 import cors from 'cors';
+import { Kafka, Partitioners } from 'kafkajs';
 // swagger-jsdoc configuration: the API docs will be generated from JSDoc comments
 const swaggerOptions = {
     definition: {
@@ -140,6 +141,8 @@ app.post('/razorpay/order', async (req, res) => {
  *       500:
  *         description: Server error
  */
+let kafkaProducer = null;
+
 app.post('/razorpay/verify', async (req, res) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -148,17 +151,46 @@ app.post('/razorpay/verify', async (req, res) => {
 
     try {
         const verified = Payment.verifyRazorpaySignature({ razorpay_order_id, razorpay_payment_id, razorpay_signature });
-        if (!verified) return res.status(400).json({ verified: false });
+        if (!verified) {
+            // mark payment as failed in DB (if exists) and publish payment.failed
+            try {
+                await Payment.update({ status: 'failed' }, { where: { transactionId: razorpay_order_id, paymentMethod: 'razorpay' } });
+                const paymentRecord = await Payment.findOne({ where: { transactionId: razorpay_order_id } });
+                const orderId = paymentRecord ? paymentRecord.orderId : null;
+                if (kafkaProducer) {
+                    const outEvent = { orderId: orderId, transactionId: razorpay_order_id, status: 'failed', reason: 'verification_failed' };
+                    await kafkaProducer.send({ topic: 'payment.failed', messages: [{ key: String(orderId), value: JSON.stringify(outEvent) }] });
+                }
+            } catch (err) {
+                console.error('Failed to mark payment failed during verification:', err);
+            }
+            return res.status(400).json({ verified: false });
+        }
+        // mark payment as completed in DB and publish payment.succeeded event
+        try {
+            const [count] = await Payment.update({ status: 'completed' }, { where: { transactionId: razorpay_order_id, paymentMethod: 'razorpay' } });
+            if (count === 0) {
+                console.warn('No payment record found to update for transaction', razorpay_order_id);
+            }
 
-        Payment.update({status: 'completed'}, {
-            where: { transactionId: razorpay_order_id, paymentMethod: 'razorpay' }
-        }).then(() => {
-            console.log(`Payment record with transactionId ${razorpay_order_id} marked as completed.`);
-        }).catch((err) => {
-            console.error('Failed to update payment record status:', err);
-        });
+            // fetch the payment record to get orderId
+            const paymentRecord = await Payment.findOne({ where: { transactionId: razorpay_order_id } });
+            const orderId = paymentRecord ? paymentRecord.orderId : null;
 
-        res.json({ verified: true });
+            // publish payment.succeeded
+            if (kafkaProducer) {
+                const outEvent = { orderId: orderId, transactionId: razorpay_order_id, status: 'succeeded' };
+                await kafkaProducer.send({ topic: 'payment.succeeded', messages: [{ key: String(orderId), value: JSON.stringify(outEvent) }] });
+                console.log('Published payment.succeeded for order', orderId);
+            } else {
+                console.warn('Kafka producer not available, skipping publishing payment.succeeded');
+            }
+
+            res.json({ verified: true });
+        } catch (err) {
+            console.error('Failed to update payment record status or publish event:', err);
+            return res.status(500).json({ error: 'failed to complete payment post-verification' });
+        }
     } catch (error) {
         console.error('Error verifying razorpay payment:', error);
         res.status(500).json({ error: error.message });
@@ -166,7 +198,88 @@ app.post('/razorpay/verify', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, async () => {
+async function start() {
+    // Kafka setup
+    const kafka = new Kafka({ brokers: ['localhost:7092'], clientId: 'payment-service' });
+
+    // Use legacy partitioner to retain prior partitioning behavior and silence warning
+    const producer = kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner });
+    const consumer = kafka.consumer({ groupId: 'payment-service-group' });
+
+    // Ensure topics exist using admin API before connecting consumer/producer
+    const admin = kafka.admin();
+    await admin.connect();
+    const topicsToEnsure = [
+        'inventory.reserved', 'inventory.reservation_failed', 'inventory.released',
+        'payment.initiated', 'payment.succeeded', 'payment.failed'
+    ];
+    try {
+        await admin.createTopics({
+            topics: topicsToEnsure.map(t => ({ topic: t, numPartitions: 1, replicationFactor: 1 })),
+            waitForLeaders: true
+        });
+        console.log('Ensured Kafka topics:', topicsToEnsure.join(', '));
+    } catch (err) {
+        console.warn('Could not ensure Kafka topics (they may already exist or broker may not allow creation):', err.message || err);
+    }
+    await admin.disconnect();
+
+    await producer.connect();
+    await consumer.connect();
+    kafkaProducer = producer;
+
+    // Listen for inventory.reserved events
+    await consumer.subscribe({ topic: 'inventory.reserved', fromBeginning: true });
+    consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+            try {
+                const payload = message.value.toString();
+                console.log('Payment service received event on', topic, payload);
+
+                let event = {};
+                try { event = JSON.parse(payload); } catch (e) { }
+
+                // Production behavior: create a payment record with status 'pending' and let
+                // the client/payment gateway complete the payment and call /razorpay/verify.
+                // Do NOT simulate success/failure here.
+                const orderId = event.orderId || null;
+                const amount = event.amount || null;
+                const currency = event.currency || 'INR';
+                
+                const order = await Payment.createRazorpayOrder({
+                    amount: amount,
+                    currency: currency,
+                    receipt: `autopay_rcpt_${orderId || 'unknown'}`,
+                    payment_capture: 1
+                });
+                // create a DB payment record linking to the local orderId
+                try {
+                    await Payment.createPaymentRecord({
+                        orderId: orderId,
+                        paymentMethod: 'autopay',
+                        transactionId: order.id,
+                        amount: amount || 0,
+                        currency: currency,
+                        status: 'pending'
+                    });
+
+                    // Publish an event indicating payment was initiated; downstream systems
+                    // can observe this and the client will still need to complete payment.
+                    const initiatedEvent = { orderId: orderId, transactionId: order.id, status: 'pending' };
+                    await producer.send({ topic: 'payment.initiated', messages: [{ key: String(orderId), value: JSON.stringify(initiatedEvent) }] });
+                    console.log('Payment initiated for order', orderId, initiatedEvent);
+                } catch (dbErr) {
+                    console.error('Failed to create payment record:', dbErr);
+                    // publish payment.failed so saga can react to failure to start payment
+                    const failedEvent = { orderId: orderId, status: 'failed', reason: 'db_error' };
+                    await producer.send({ topic: 'payment.failed', messages: [{ key: String(orderId), value: JSON.stringify(failedEvent) }] });
+                }
+            } catch (err) {
+                console.error('Error handling inventory.reserved message', err);
+            }
+        }
+    });
+
     try{
         console.log(`Server is running on port ${PORT}`);
         await initializeModels();
@@ -174,5 +287,9 @@ app.listen(PORT, async () => {
     } catch (error) {
         console.error("Error starting the server:", error);
     }
-});
+
+    app.listen(PORT, () => console.log(`HTTP server listening on ${PORT}`));
+}
+
+start().catch(err => console.error('Failed to start service', err));
 

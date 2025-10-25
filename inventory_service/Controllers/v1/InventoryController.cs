@@ -55,5 +55,13 @@ namespace inventory_service.Controllers.v1
             await _inventoryService.DeleteAsync(id, cancellationToken);
             return NoContent();
         }
+
+        [HttpGet("store/{storeId}/productsku/{productSku}")]
+        public async Task<IActionResult> GetByStoreAndProductSku(int storeId, string productSku, CancellationToken cancellationToken)
+        {
+            var item = await _inventoryService.GetByStoreAndProductSkuAsync(storeId, productSku, cancellationToken);
+            if (item == null) return NotFound();
+            return Ok(item);
+        }
     }
 }

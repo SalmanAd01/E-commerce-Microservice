@@ -33,8 +33,8 @@ public class OrderItem {
     @JoinColumn(name="order_id", nullable=false)
     private Order order;
 
-    @Column(name = "product_id", nullable = false)
-    private String productId;
+    @Column(name = "product_sku", nullable = false)
+    private String productSku;
 
     @Column(name = "store_id", nullable = false)
     private Long storeId;

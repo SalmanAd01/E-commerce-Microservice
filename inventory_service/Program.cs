@@ -31,6 +31,8 @@ builder.Services.AddHttpClient("product", client =>
 builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
+// Register Kafka background hosted service
+builder.Services.AddHostedService<inventory_service.Services.KafkaHostedService>();
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {

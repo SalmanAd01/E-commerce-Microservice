@@ -104,6 +104,13 @@ namespace inventory_service.Services
             }
         }
 
+        public async Task<InventoryResponseDto?> GetByStoreAndProductSkuAsync(int storeId, string productSku, CancellationToken cancellationToken = default)
+        {
+            var item = await _inventoryRepository.GetByStoreAndSkuAsync(storeId, productSku, cancellationToken).ConfigureAwait(false);
+            if (item == null) return null;
+            return InventoryMapper.ToDto(item);
+        }
+
         private class ProductApiModel
         {
             public string? Id { get; set; }

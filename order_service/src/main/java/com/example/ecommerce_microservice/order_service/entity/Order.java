@@ -12,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,5 +56,17 @@ public class Order {
         PROCESSING,
         COMPLETED,
         CANCELLED
+    }
+
+    @PrePersist
+    @PreUpdate
+    protected void calculateTotalAmount() {
+        if (orderItems != null && !orderItems.isEmpty()) {
+            this.totalAmount = orderItems.stream()
+                    .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                    .sum();
+        } else {
+            this.totalAmount = 0.0;
+        }
     }
 }
