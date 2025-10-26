@@ -53,7 +53,11 @@ public class Order {
 
     public enum OrderStatus {
         PENDING,
-        PROCESSING,
+        INVENTORY_RESERVED,
+        INVENTORY_RESERVATION_FAILED,
+        PAYMENT_INITIATED,
+        PAYMENT_SUCCESSFUL,
+        PAYMENT_FAILED,
         COMPLETED,
         CANCELLED
     }

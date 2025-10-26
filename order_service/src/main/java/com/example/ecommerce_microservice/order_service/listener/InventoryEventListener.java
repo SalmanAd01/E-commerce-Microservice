@@ -22,25 +22,22 @@ public class InventoryEventListener {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    @KafkaListener(topics = {"inventory.reservation_failed"}, groupId = "order-service-group")
+    @KafkaListener(topics = {"inventory.reservation_failed", "inventory.reserved"}, groupId = "order-service-group")
     public void onInventoryReservationFailed(String message) {
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> event = objectMapper.readValue(message, Map.class);
+
             if (event.get("orderId") != null) {
                 Long parsedOrderId = Long.valueOf(String.valueOf(event.get("orderId")));
                 final Long orderIdFinal = parsedOrderId;
                 orderRepository.findById(orderIdFinal).ifPresent(order -> {
-                    order.setStatus(Order.OrderStatus.CANCELLED);
-                    orderRepository.save(order);
-                    // publish order.cancelled for other services (inventory will react to releases if needed)
-                    try {
-                        Map<String, Object> out = Map.of("orderId", orderIdFinal, "reason", "inventory_reservation_failed");
-                        String outEvent = objectMapper.writeValueAsString(out);
-                        kafkaTemplate.send("order.cancelled", outEvent);
-                    } catch (Exception e) {
-                        System.err.println("Failed to publish order.cancelled from inventory failure: " + e.getMessage());
+                    if ("inventory.reserved".equals(event.get("eventType"))) {
+                        order.setStatus(Order.OrderStatus.INVENTORY_RESERVED);
+                    } else {
+                        order.setStatus(Order.OrderStatus.INVENTORY_RESERVATION_FAILED);
                     }
+                    orderRepository.save(order);
                 });
             }
         } catch (Exception ex) {

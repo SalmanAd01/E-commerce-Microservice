@@ -1,7 +1,11 @@
 package com.example.ecommerce_microservice.order_service.controller.v1;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +22,19 @@ import com.example.ecommerce_microservice.order_service.service.OrderService;
 public class OrderController {
 
     @GetMapping("/")
-    public String getOrders() {
-        return "List of orders";
+    public ResponseEntity<List<OrderDto>> getOrders() {
+        List<Order> orders = orderService.getAllOrders();
+        List<OrderDto> dtos = orders.stream()
+                .map(OrderMapper::toDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<OrderDto> getOrderById(@PathVariable("orderId") Long orderId) {
+        Order order = orderService.getOrderById(orderId);
+        OrderDto dto = OrderMapper.toDto(order);
+        return ResponseEntity.ok(dto);
     }
 
     private final OrderService orderService;
@@ -34,4 +49,17 @@ public class OrderController {
         OrderDto dto = OrderMapper.toDto(saved);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/{orderId}/complete")
+    public ResponseEntity<OrderDto> completeOrder(@PathVariable("orderId") Long orderId) {
+        Order saved = orderService.completeOrder(orderId);
+        return ResponseEntity.ok(OrderMapper.toDto(saved));
+    }
+
+    @PostMapping("/{orderId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable("orderId") Long orderId) {
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.noContent().build();
+    }
+    
 }
