@@ -33,7 +33,6 @@ namespace Inventory.Infrastructure.Repositories
 
             await _context.Database.ExecuteSqlInterpolatedAsync($@"UPDATE inventories
 SET reserved_quantity = GREATEST(reserved_quantity - {quantity}, 0),
-    total_quantity = total_quantity + {quantity},
     updated_at = NOW()
 WHERE store_id = {storeId} AND product_sku = {sku}", cancellationToken).ConfigureAwait(false);
         }
