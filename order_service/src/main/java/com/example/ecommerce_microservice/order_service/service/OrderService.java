@@ -139,10 +139,10 @@ public class OrderService {
             var order = orderRepository.findById(orderId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
 
-            // if (order.getStatus() != Order.OrderStatus.PAYMENT_SUCCESSFUL) {
-            //     throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-            //             "Order status must be PAYMENT_SUCCESSFUL to complete");
-            // }
+            if (order.getStatus() != Order.OrderStatus.PAYMENT_SUCCESSFUL) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Order status must be PAYMENT_SUCCESSFUL to complete");
+            }
 
             order.setStatus(Order.OrderStatus.COMPLETED);
             order.setUpdatedAt(LocalDateTime.now());
