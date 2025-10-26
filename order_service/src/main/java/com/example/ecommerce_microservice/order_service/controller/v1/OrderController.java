@@ -3,6 +3,7 @@ package com.example.ecommerce_microservice.order_service.controller.v1;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,11 +18,13 @@ import com.example.ecommerce_microservice.order_service.entity.Order;
 import com.example.ecommerce_microservice.order_service.mapper.OrderMapper;
 import com.example.ecommerce_microservice.order_service.service.OrderService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/orders")
 public class OrderController {
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<OrderDto>> getOrders() {
         List<Order> orders = orderService.getAllOrders();
         List<OrderDto> dtos = orders.stream()
@@ -43,11 +46,11 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PostMapping("/")
-    public ResponseEntity<OrderDto> createOrder(@RequestBody CreateOrderDto body) {
+    @PostMapping("")
+    public ResponseEntity<OrderDto> createOrder(@Valid @RequestBody CreateOrderDto body) {
         Order saved = orderService.createOrder(body);
         OrderDto dto = OrderMapper.toDto(saved);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PostMapping("/{orderId}/complete")
