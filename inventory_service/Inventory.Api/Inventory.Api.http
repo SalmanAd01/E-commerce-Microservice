@@ -1,0 +1,11 @@
+@Inventory_Api_HostAddress = http://localhost:5168
+
+GET {{Inventory_Api_HostAddress}}/swagger/
+
+###
+
+GET {{Inventory_Api_HostAddress}}/api/v1/stores
+
+###
+
+GET {{Inventory_Api_HostAddress}}/api/v1/inventories

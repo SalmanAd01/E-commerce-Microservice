@@ -1,1 +1,5 @@
-{}
+{
+    "omnisharp.maxProjectResults": 100,
+    "omnisharp.useModernNet": true,
+    "omnisharp.loggingLevel": "error"
+}
