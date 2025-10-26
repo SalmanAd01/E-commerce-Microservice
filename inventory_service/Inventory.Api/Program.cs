@@ -47,6 +47,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Inventory.Application.Valid
 // Kafka message handlers (Strategy pattern)
 builder.Services.AddSingleton<IKafkaMessageHandler, OrderCreatedHandler>();
 builder.Services.AddSingleton<IKafkaMessageHandler, OrderCancelledHandler>();
+builder.Services.AddSingleton<IKafkaMessageHandler, OrderCompletedHandler>();
 builder.Services.AddSingleton<IKafkaClientFactory, KafkaClientFactory>();
 builder.Services.AddHostedService<KafkaHostedService>();
 

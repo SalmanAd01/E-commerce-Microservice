@@ -32,8 +32,27 @@ namespace Inventory.Infrastructure.Repositories
             if (quantity <= 0) return;
 
             await _context.Database.ExecuteSqlInterpolatedAsync($@"UPDATE inventories
-SET reserved_quantity = GREATEST(reserved_quantity - {quantity}, 0), updated_at = NOW()
+SET reserved_quantity = GREATEST(reserved_quantity - {quantity}, 0),
+    total_quantity = total_quantity + {quantity},
+    updated_at = NOW()
 WHERE store_id = {storeId} AND product_sku = {sku}", cancellationToken).ConfigureAwait(false);
+        }
+
+        public async Task<bool> CommitReservationAsync(int storeId, string sku, int quantity, System.Threading.CancellationToken cancellationToken = default)
+        {
+            if (quantity <= 0) return false;
+
+            // Atomically decrement reserved and total only if there is sufficient reserved and total quantity
+            var res = await _context.Database.ExecuteSqlInterpolatedAsync($@"UPDATE inventories
+SET reserved_quantity = reserved_quantity - {quantity},
+    total_quantity = total_quantity - {quantity},
+    updated_at = NOW()
+WHERE store_id = {storeId}
+  AND product_sku = {sku}
+  AND reserved_quantity >= {quantity}
+  AND total_quantity >= {quantity}", cancellationToken).ConfigureAwait(false);
+
+            return res > 0;
         }
     }
 }

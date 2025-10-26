@@ -4,6 +4,6 @@ namespace Inventory.Infrastructure.Configuration
     {
         public string BootstrapServers { get; set; } = "localhost:7092";
         public string GroupId { get; set; } = "inventory-service-group";
-        public string[] EnsureTopics { get; set; } = new[] { "inventory.reserved", "inventory.reservation_failed", "inventory.released" };
+        public string[] EnsureTopics { get; set; } = new[] { "inventory.reserved", "inventory.reservation_failed", "inventory.released", "inventory.committed", "inventory.commit_failed" };
     }
 }
