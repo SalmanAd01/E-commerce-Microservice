@@ -193,6 +193,14 @@ public class OrderService {
     public void cancelOrder(Long orderId) {
         var order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        
+        if (order.getStatus() == Order.OrderStatus.COMPLETED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Completed orders cannot be cancelled");
+        }
+
+        if (order.getStatus() == Order.OrderStatus.CANCELLED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order is already cancelled");
+        }
 
         order.setStatus(Order.OrderStatus.CANCELLED);
         order.setUpdatedAt(LocalDateTime.now());
