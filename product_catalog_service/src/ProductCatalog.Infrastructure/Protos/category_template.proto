@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package categorytemplate.v1;
+
+option csharp_namespace = "CategoryTemplate.Grpc";
+
+service CategoryTemplateService {
+  rpc GetTemplateById (GetTemplateByIdRequest) returns (GetTemplateByIdResponse);
+}
+
+message GetTemplateByIdRequest { int64 id = 1; }
+message GetTemplateByIdResponse { Template template = 1; }
+
+message Template {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  Department department = 4;
+  Category category = 5;
+  repeated Attribute attributes = 6;
+  string created_at = 7; // ISO-8601
+}
+
+message Department { int64 id = 1; string name = 2; }
+message Category { int64 id = 1; string name = 2; }
+
+message Attribute {
+  int64 id = 1;
+  string name = 2;
+  DataType data_type = 3;
+}
+
+enum DataType { DATA_TYPE_UNSPECIFIED = 0; TEXT = 1; NUMBER = 2; BOOLEAN = 3; }

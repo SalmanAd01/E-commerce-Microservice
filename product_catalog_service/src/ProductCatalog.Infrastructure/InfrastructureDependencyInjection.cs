@@ -6,6 +6,8 @@ using ProductCatalog.Infrastructure.Data;
 using ProductCatalog.Infrastructure.External;
 using ProductCatalog.Infrastructure.Repositories;
 using ProductCatalog.Infrastructure.Settings;
+using CategoryTemplate.Grpc;
+using Grpc.Net.ClientFactory;
 
 namespace ProductCatalog.Infrastructure
 {
@@ -20,12 +22,25 @@ namespace ProductCatalog.Infrastructure
             services.AddScoped<IBrandRepository, BrandRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
 
-            var templateBaseUrl = configuration["TemplateService:BaseUrl"] ?? "http://localhost:8080/";
-            services.AddHttpClient<ITemplateService, TemplateHttpService>(client =>
+            var useGrpc = bool.TryParse(configuration["TemplateService:UseGrpc"], out var u) && u;
+            if (useGrpc)
             {
-                client.BaseAddress = new Uri(templateBaseUrl);
-                client.Timeout = TimeSpan.FromSeconds(10);
-            });
+                var address = configuration["TemplateService:Grpc:Address"] ?? "http://localhost:9090";
+                services.AddGrpcClient<CategoryTemplateService.CategoryTemplateServiceClient>(o =>
+                {
+                    o.Address = new Uri(address);
+                });
+                services.AddScoped<ITemplateService, TemplateGrpcService>();
+            }
+            else
+            {
+                var templateBaseUrl = configuration["TemplateService:BaseUrl"] ?? "http://localhost:8080/";
+                services.AddHttpClient<ITemplateService, TemplateHttpService>(client =>
+                {
+                    client.BaseAddress = new Uri(templateBaseUrl);
+                    client.Timeout = TimeSpan.FromSeconds(10);
+                });
+            }
 
             return services;
         }
