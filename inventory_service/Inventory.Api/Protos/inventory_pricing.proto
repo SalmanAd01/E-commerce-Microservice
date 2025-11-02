@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package inventory.pricing.v1;
+
+option csharp_namespace = "Inventory.Grpc";
+option java_multiple_files = true;
+option java_package = "com.example.ecommerce_microservice.inventory.pricing.v1";
+
+message PriceRequest {
+  int64 store_id = 1;
+  string product_sku = 2;
+}
+
+message PriceResponse {
+  double selling_price = 1;
+  bool available = 2;
+}
+
+service InventoryPricing {
+  rpc GetSellingPrice(PriceRequest) returns (PriceResponse);
+}

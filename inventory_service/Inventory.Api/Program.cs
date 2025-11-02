@@ -13,8 +13,19 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Inventory.Api.Grpc;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Kestrel endpoints:
+// - 5168: HTTP/1.1 + HTTP/2 for REST controllers and (optional) gRPC over h2c
+// - 5169: HTTP/2 (h2c) dedicated for gRPC
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5168, o => o.Protocols = HttpProtocols.Http1AndHttp2);
+    options.ListenAnyIP(5169, o => o.Protocols = HttpProtocols.Http2);
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,6 +48,7 @@ builder.Services.AddHttpClient("product", client =>
 });
 
 builder.Services.AddControllers();
+builder.Services.AddGrpc();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 builder.Services.AddProblemDetails();
 // Options pattern for Kafka
@@ -85,6 +97,12 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler();
-app.UseHttpsRedirection();
+// Avoid HTTPS redirection in Development to keep gRPC h2c (plaintext) working and
+// because no HTTPS endpoint is explicitly configured here.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 app.MapControllers();
+app.MapGrpcService<InventoryPricingService>();
 app.Run();

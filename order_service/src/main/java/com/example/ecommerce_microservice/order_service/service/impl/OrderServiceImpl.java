@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.ecommerce_microservice.order_service.client.InventoryClient;
+import com.example.ecommerce_microservice.order_service.client.InventoryGrpcClient;
 import com.example.ecommerce_microservice.order_service.common.exception.BadRequestException;
 import com.example.ecommerce_microservice.order_service.common.exception.ResourceNotFoundException;
 import com.example.ecommerce_microservice.order_service.dto.CreateOrderDto;
@@ -28,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
+    private final InventoryGrpcClient inventoryGrpcClient;
     private final OrderEventPublisher eventPublisher;
 
     @Override
@@ -48,7 +50,13 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         if (createOrderDto.getItems() != null) {
             for (CreateOrderItemDto it : createOrderDto.getItems()) {
-                double priceToUse = inventoryClient.getSellingPrice(it.getStoreId(), it.getProductSku());
+                double priceToUse;
+                try {
+                    priceToUse = inventoryGrpcClient.getSellingPrice(it.getStoreId(), it.getProductSku());
+                } catch (Exception ex) {
+                    log.warn("gRPC pricing lookup failed, falling back to HTTP: {}", ex.getMessage());
+                    priceToUse = inventoryClient.getSellingPrice(it.getStoreId(), it.getProductSku());
+                }
 
                 OrderItem oi = OrderItem.builder()
                         .order(order)
